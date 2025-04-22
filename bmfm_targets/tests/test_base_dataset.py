@@ -24,7 +24,7 @@ from .helpers import MockTestDataPaths
 
 
 def test_backed_csr_and_in_memory_csr_reads_are_the_same():
-    data_path = MockTestDataPaths.root / "h5ad" / ",ock_test_data.h5ad"
+    data_path = MockTestDataPaths.root / "h5ad" / "mock_test_data.h5ad"
     ad = read_h5ad(data_path)
     ad_backed = read_h5ad(data_path, backed="r")
     all_genes = ad_backed.var_names
@@ -146,12 +146,14 @@ def create_random_dataset_with_gene_order_col():
 
 
 def test_data_module_setup_predict_gives_all_splits(
-    pl_data_module_mock_data_seq_cls: Zheng68kDataModule,
+    pl_data_module_mock_data_seq_cls,
 ):
-    data_module = Zheng68kDataModule(
+    data_module = DataModule(
         dataset_kwargs={
             "processed_data_source": pl_data_module_mock_data_seq_cls.processed_data_file,
-            "source_h5ad_file_name":"mock_test_data.h5ad",
+            "label_dict_path": pl_data_module_mock_data_seq_cls.dataset_kwargs[
+                "label_dict_path"
+            ]
             # "filter_query": "split_stratified_celltype != 'test'"
         },
         tokenizer=pl_data_module_mock_data_seq_cls.tokenizer,
@@ -174,10 +176,12 @@ def test_data_module_setup_predict_gives_all_splits(
 def test_data_module_setup_test_gives_test_only(
     pl_data_module_mock_data_seq_cls: Zheng68kDataModule,
 ):
-    data_module = Zheng68kDataModule(
+    data_module = DataModule(
         dataset_kwargs={
             "processed_data_source": pl_data_module_mock_data_seq_cls.processed_data_file,
-            "source_h5ad_file_name":"mock_test_data.h5ad",
+            "label_dict_path": pl_data_module_mock_data_seq_cls.dataset_kwargs[
+                "label_dict_path"
+            ],
         },
         tokenizer=pl_data_module_mock_data_seq_cls.tokenizer,
         fields=pl_data_module_mock_data_seq_cls.fields,
@@ -268,7 +272,9 @@ def test_data_module_init_with_generic_dataset_seq_cls_transform_true(
                 "label_dict_path": Path(d) / "label_dict.json",
             },
             transform_kwargs={
-                "source_h5ad_file_name": MockTestDataPaths.root / "h5ad" / "mock_test_data.h5ad",
+                "source_h5ad_file_name": MockTestDataPaths.root
+                / "h5ad"
+                / "mock_test_data.h5ad",
                 "processed_h5ad_file_name": Path(d) / "processed.h5ad",
                 "stratifying_label": "celltype",
             },
@@ -319,7 +325,9 @@ def test_data_module_init_with_generic_dataset_mlm(gene2vec_fields):
                 "processed_data_source": Path(d) / "processed.h5ad",
             },
             transform_kwargs={
-                "source_h5ad_file_name": MockTestDataPaths.root / "h5ad" / "mock_test_data.h5ad",
+                "source_h5ad_file_name": MockTestDataPaths.root
+                / "h5ad"
+                / "mock_test_data.h5ad",
                 "processed_h5ad_file_name": Path(d) / "processed.h5ad",
                 "stratifying_label": None,
             },

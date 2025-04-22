@@ -1,5 +1,4 @@
 import logging
-import os
 import random
 import tempfile
 from pathlib import Path
@@ -57,6 +56,7 @@ from bmfm_targets.tokenization import (
     get_snp2vec_tokenizer,
     load_tokenizer,
 )
+from bmfm_targets.training.data_module import DataModule
 from bmfm_targets.training.modules import (
     MLMTrainingModule,
     MultiTaskTrainingModule,
@@ -881,6 +881,38 @@ def pl_data_module_panglao_regression(
 
 
 @pytest.fixture(scope="session")
+def pl_data_module_mock_data_mlm_rda(
+    all_genes_fields_with_rda_regression_masking, mock_data_label_columns
+):
+    tokenizer = load_tokenizer()
+    pl_data_module = DataModule(
+        data_dir=helpers.MockTestDataPaths.root,
+        processed_name=helpers.MockTestDataPaths.no_binning_name,
+        transform_kwargs={
+            "source_h5ad_file_name": helpers.MockTestDataPaths.root
+            / "h5ad"
+            / "mock_test_data.h5ad",
+        },
+        dataset_kwargs={"label_dict_path": helpers.MockTestDataPaths.label_dict_path},
+        tokenizer=tokenizer,
+        transform_datasets=True,
+        collation_strategy="sequence_classification",
+        num_workers=0,
+        batch_size=3,
+        fields=all_genes_fields_with_rda_regression_masking,
+        label_columns=mock_data_label_columns,
+        max_length=16,
+        limit_dataset_samples={"train": 12, "dev": 12, "predict": 2},
+    )
+    pl_data_module.prepare_data()
+    pl_data_module.setup()
+    helpers.update_label_columns(
+        pl_data_module.label_columns, pl_data_module.label_dict
+    )
+    return pl_data_module
+
+
+@pytest.fixture(scope="session")
 def pl_data_module_panglao_rda(
     all_genes_fields_with_rda_regression_masking, _panglao_convert_rdata_and_transform
 ):
@@ -940,7 +972,7 @@ def pl_mock_data_mlm_no_binning(all_genes_fields_with_regression_masking):
     dm = Zheng68kDataModule(
         data_dir=helpers.MockTestDataPaths.root,
         processed_name=helpers.MockTestDataPaths.no_binning_name,
-        dataset_kwargs={"source_h5ad_file_name":"mock_test_data.h5ad"},
+        dataset_kwargs={"source_h5ad_file_name": "mock_test_data.h5ad"},
         transform_kwargs={"transforms": []},
         transform_datasets=True,
         tokenizer=tokenizer,
@@ -965,7 +997,7 @@ def pl_mock_data_mlm_no_binning_rda(
     tokenizer = load_tokenizer("all_genes")
     dm = Zheng68kDataModule(
         data_dir=helpers.MockTestDataPaths.root,
-        dataset_kwargs={"source_h5ad_file_name":"mock_test_data.h5ad"},
+        dataset_kwargs={"source_h5ad_file_name": "mock_test_data.h5ad"},
         processed_name=helpers.MockTestDataPaths.no_binning_name,
         transform_kwargs={"transforms": []},
         transform_datasets=False,
@@ -1165,9 +1197,14 @@ def pl_data_module_panglao_geneformer(
 @pytest.fixture(scope="session")
 def pl_data_module_mock_data_seq_cls(gene2vec_unmasked_fields, mock_data_label_columns):
     tokenizer = get_gene2vec_tokenizer()
-    pl_data_module = Zheng68kDataModule(
+    pl_data_module = DataModule(
         data_dir=helpers.MockTestDataPaths.root,
-        dataset_kwargs={"source_h5ad_file_name":"mock_test_data.h5ad"},
+        transform_kwargs={
+            "source_h5ad_file_name": helpers.MockTestDataPaths.root
+            / "h5ad"
+            / "mock_test_data.h5ad",
+        },
+        dataset_kwargs={"label_dict_path": helpers.MockTestDataPaths.label_dict_path},
         tokenizer=tokenizer,
         transform_datasets=True,
         collation_strategy="sequence_classification",
@@ -1191,7 +1228,7 @@ def pl_data_module_mock_data_multitask(gene2vec_fields, mock_data_label_columns)
     tokenizer = get_gene2vec_tokenizer()
     pl_data_module = Zheng68kDataModule(
         data_dir=helpers.MockTestDataPaths.root,
-        dataset_kwargs={"source_h5ad_file_name":"mock_test_data.h5ad"},
+        dataset_kwargs={"source_h5ad_file_name": "mock_test_data.h5ad"},
         tokenizer=tokenizer,
         transform_datasets=True,
         collation_strategy="multitask",
@@ -1574,7 +1611,7 @@ def mock_data_dataset_kwargs_after_transform_without_labels(
         "processed_data_source": pl_data_module_mock_data_seq_cls.processed_data_file,
         "label_dict_path": MockTestDataPaths.label_dict_path,
         "split_column_name": "split_stratified_celltype",
-        "source_h5ad_file_name":"mock_test_data.h5ad",
+        "source_h5ad_file_name": "mock_test_data.h5ad",
     }
     return ds_kwargs
 
@@ -1586,7 +1623,7 @@ def mock_data_dataset_kwargs_after_transform(pl_data_module_mock_data_seq_cls):
         "label_dict_path": MockTestDataPaths.label_dict_path,
         "label_columns": ["celltype", "cell_type_ontology_term_id"],
         "stratifying_label": "celltype",
-        "source_h5ad_file_name":"mock_test_data.h5ad",
+        "source_h5ad_file_name": "mock_test_data.h5ad",
     }
     return ds_kwargs
 

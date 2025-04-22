@@ -386,11 +386,11 @@ def test_downsample_sequence_labeling_collator(
 
 
 def test_downsample_language_modeling_collator(
-    all_genes_fields_with_rda_regression_masking, pl_data_module_panglao_rda
+    all_genes_fields_with_rda_regression_masking, pl_data_module_mock_data_mlm_rda
 ):
     batch_size = 4
     tokenizer = load_tokenizer("all_genes")
-    dataset = pl_data_module_panglao_rda.train_dataset
+    dataset = pl_data_module_mock_data_mlm_rda.train_dataset
 
     data_collator = MultiFieldCollator(
         tokenizer,
@@ -414,11 +414,11 @@ def test_downsample_language_modeling_collator(
 
 
 def test_downsample_language_modeling_collator_batchwise_pad(
-    all_genes_fields_with_rda_regression_masking, pl_data_module_panglao_rda
+    all_genes_fields_with_rda_regression_masking, pl_data_module_mock_data_mlm_rda
 ):
     batch_size = 16
     tokenizer = load_tokenizer("all_genes")
-    dataset = pl_data_module_panglao_rda.train_dataset
+    dataset = pl_data_module_mock_data_mlm_rda.train_dataset
 
     data_collator = MultiFieldCollator(
         tokenizer,

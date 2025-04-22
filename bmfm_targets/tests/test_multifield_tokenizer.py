@@ -139,7 +139,7 @@ def test_create_save_and_load_inside_prefix():
 
 
 def test_convert_old_tokenizer_and_load():
-    vocab_path = Path(__file__).parent / "test_vocab"
+    vocab_path = Path(__file__).parent / "resources" / "test_vocab"
     multi_field_tokenizer_from_multivocab: MultiFieldTokenizer = (
         MultiFieldTokenizer.from_old_multifield_tokenizer(
             str(vocab_path),
