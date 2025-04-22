@@ -1,12 +1,14 @@
 import os
 import random
 from collections import defaultdict
+from functools import wraps
 from pathlib import Path
 from subprocess import call
 
 import anndata as ad
 import numpy as np
 import pandas as pd
+import pytest
 from pytorch_lightning.callbacks import ModelCheckpoint
 from scanpy import read_h5ad
 from scipy.sparse import csr_matrix
@@ -30,6 +32,39 @@ from bmfm_targets.tokenization import (
 
 FINETUNE_ROOT = Path(__file__).parent / "resources" / "finetune"
 PRETRAIN_ROOT = Path(__file__).parent / "resources" / "pretrain"
+
+
+def _resolve_dotted_path(name):
+    parts = name.split(".")
+    obj = globals()[parts[0]]
+    for part in parts[1:]:
+        obj = getattr(obj, part)
+    return obj
+
+
+def skip_if_missing(paths):
+    def decorator(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            missing = []
+            for path_str in paths:
+                try:
+                    value = (
+                        _resolve_dotted_path(path_str)
+                        if isinstance(path_str, str)
+                        else path_str
+                    )
+                    if not Path(value).exists():
+                        missing.append(f"{path_str} -> {value}")
+                except Exception as e:
+                    missing.append(f"{path_str} -> ERROR: {e}")
+            if missing:
+                pytest.skip("Missing required paths:\n" + "\n".join(missing))
+            return func(*args, **kwargs)
+
+        return wrapper
+
+    return decorator
 
 
 class TorchListDataset(Dataset):

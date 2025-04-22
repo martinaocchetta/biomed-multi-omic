@@ -90,6 +90,7 @@ def test_norm_transform():
     assert transformed_data is not None
 
 
+@helpers.skip_if_missing(["TEST_GTF_PATH"])
 def test_TPM_norm_transform():
     adata = get_random_anndata_with_gene_names()
     transform = sc_transforms.TPMNormalizationTransform(
@@ -265,6 +266,7 @@ def test_chained_transform():
     assert binned_data is not None
 
 
+@helpers.skip_if_missing(["TEST_GTF_PATH"])
 def test_chained_transform_bulk_RNA():
     # Apply the filter cells transformation
     adata = get_random_anndata_with_gene_names()
