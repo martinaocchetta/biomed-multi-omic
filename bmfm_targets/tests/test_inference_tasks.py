@@ -7,12 +7,14 @@ import pytest
 
 from bmfm_targets import config
 from bmfm_targets.datasets.sciplex3 import SciPlex3DataModule
-#from bmfm_targets.datasets.scp1884 import SCP1884DataModule
+
+# from bmfm_targets.datasets.scp1884 import SCP1884DataModule
 from bmfm_targets.datasets.zheng68k import Zheng68kDataModule
 from bmfm_targets.tasks import task_utils
 from bmfm_targets.tasks.task_utils import calculate_95_ci
 from bmfm_targets.tests import helpers
 from bmfm_targets.tokenization import load_tokenizer
+from bmfm_targets.training.data_module import DataModule
 from bmfm_targets.training.modules import SequenceClassificationTrainingModule
 
 
@@ -70,12 +72,12 @@ def test_zheng68k_predict_no_train_including_non_input_fields(
         intermediate_size=32,
         hidden_size=16,
     )
-    data_module = Zheng68kDataModule(
+    data_module = DataModule(
         tokenizer=pl_mock_data_mlm_no_binning.tokenizer,
         fields=all_genes_fields_with_rda_regression_masking,
         data_dir=helpers.MockTestDataPaths.root,
         processed_name=helpers.MockTestDataPaths.no_binning_name,
-        dataset_kwargs={"source_h5ad_file_name":"mock_test_data.h5ad"},
+        dataset_kwargs={"label_dict_path": helpers.MockTestDataPaths.label_dict_path},
         label_columns=pl_data_module_mock_data_seq_cls.label_columns,
         transform_datasets=False,
         batch_size=2,
@@ -129,6 +131,7 @@ def test_zheng68k_predict_no_train_including_non_input_fields(
         }
 
 
+@helpers.skip_if_missing(["helpers.SciPlex3Paths.root"])
 def test_different_pooling_choices_respected(gene2vec_fields, sciplex3_label_columns):
     test_size = 10
     dm = SciPlex3DataModule(
@@ -324,10 +327,10 @@ def test_zheng68k_scbert_test_run_after_train(
         )
 
 
-#def test_scp1884_prediction_on_zheng_ckpt(
+# def test_scp1884_prediction_on_zheng_ckpt(
 #    gene2vec_unmasked_fields,
 #    mock_data_seq_cls_ckpt,
-#):
+# ):
 #    dm = SCP1884DataModule(
 #        data_dir=helpers.SCP1884Paths.root,
 #        mlm=False,
@@ -377,10 +380,10 @@ def test_zheng68k_scbert_test_run_after_train(
 #        )
 
 
-#def test_scp1884_prediction_on_zheng_multitask_ckpt(
+# def test_scp1884_prediction_on_zheng_multitask_ckpt(
 #    gene2vec_unmasked_fields,
 #    mock_data_multitask_ckpt,
-#):
+# ):
 #    dm = SCP1884DataModule(
 #        data_dir=helpers.SCP1884Paths.root,
 #        mlm=False,
@@ -430,10 +433,10 @@ def test_zheng68k_scbert_test_run_after_train(
 #        )
 
 
-#def test_generic_dataset_with_no_label_dict_prediction_on_zheng_ckpt(
+# def test_generic_dataset_with_no_label_dict_prediction_on_zheng_ckpt(
 #    gene2vec_fields,
 #    mock_data_seq_cls_ckpt,
-#):
+# ):
 #    from bmfm_targets.training.data_module import DataModule
 
 #    dm = SCP1884DataModule(
@@ -500,6 +503,7 @@ def test_zheng68k_scbert_test_run_after_train(
 #        )
 
 
+@helpers.skip_if_missing(["helpers.SciPlex3Paths.root"])
 def test_sciplex3_regression_predict_no_train(gene2vec_fields, mock_data_seq_cls_ckpt):
     from bmfm_targets.datasets.sciplex3 import SciPlex3DataModule
 

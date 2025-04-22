@@ -124,7 +124,7 @@ def test_can_choose_correct_scnystromformer_model(sc_nystromformer_config):
 def test_can_choose_training_module_for_data_module(fields, label_columns):
     mlm_data_module = Zheng68kDataModule(
         tokenizer=get_gene2vec_tokenizer(),
-        dataset_kwargs={"source_h5ad_file_name":"mock_test_data.h5ad"},
+        dataset_kwargs={"source_h5ad_file_name": "mock_test_data.h5ad"},
         fields=fields,
         collation_strategy="language_modeling",
         mlm=True,
@@ -133,7 +133,7 @@ def test_can_choose_training_module_for_data_module(fields, label_columns):
 
     classification_data_module = Zheng68kDataModule(
         tokenizer=get_gene2vec_tokenizer(),
-        dataset_kwargs={"source_h5ad_file_name":"mock_test_data.h5ad"},
+        dataset_kwargs={"source_h5ad_file_name": "mock_test_data.h5ad"},
         fields=fields,
         label_columns=label_columns,
         collation_strategy="sequence_classification",
@@ -195,6 +195,9 @@ def check_for_scbert_config(
     assert output_size == 1337
 
 
+@helpers.skip_if_missing(
+    ["helpers.CellXGenePaths.root", " helpers.CellXGenePaths.label_dict_path"]
+)
 def test_can_derive_num_label_columns_with_downsampled_dataset(
     fields, cellxgene_label_columns
 ):

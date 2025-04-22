@@ -969,11 +969,16 @@ def pl_data_module_panglao_rda(
 @pytest.fixture(scope="session")
 def pl_mock_data_mlm_no_binning(all_genes_fields_with_regression_masking):
     tokenizer = load_tokenizer("all_genes")
-    dm = Zheng68kDataModule(
+    dm = DataModule(
         data_dir=helpers.MockTestDataPaths.root,
         processed_name=helpers.MockTestDataPaths.no_binning_name,
-        dataset_kwargs={"source_h5ad_file_name": "mock_test_data.h5ad"},
-        transform_kwargs={"transforms": []},
+        transform_kwargs={
+            "source_h5ad_file_name": helpers.MockTestDataPaths.root
+            / "h5ad"
+            / "mock_test_data.h5ad",
+            "transforms": [],
+        },
+        dataset_kwargs={"label_dict_path": helpers.MockTestDataPaths.label_dict_path},
         transform_datasets=True,
         tokenizer=tokenizer,
         batch_size=2,
@@ -997,9 +1002,8 @@ def pl_mock_data_mlm_no_binning_rda(
     tokenizer = load_tokenizer("all_genes")
     dm = Zheng68kDataModule(
         data_dir=helpers.MockTestDataPaths.root,
-        dataset_kwargs={"source_h5ad_file_name": "mock_test_data.h5ad"},
+        dataset_kwargs={"label_dict_path": helpers.MockTestDataPaths.label_dict_path},
         processed_name=helpers.MockTestDataPaths.no_binning_name,
-        transform_kwargs={"transforms": []},
         transform_datasets=False,
         tokenizer=tokenizer,
         batch_size=2,
@@ -1226,9 +1230,14 @@ def pl_data_module_mock_data_seq_cls(gene2vec_unmasked_fields, mock_data_label_c
 @pytest.fixture(scope="session")
 def pl_data_module_mock_data_multitask(gene2vec_fields, mock_data_label_columns):
     tokenizer = get_gene2vec_tokenizer()
-    pl_data_module = Zheng68kDataModule(
+    pl_data_module = DataModule(
         data_dir=helpers.MockTestDataPaths.root,
-        dataset_kwargs={"source_h5ad_file_name": "mock_test_data.h5ad"},
+        transform_kwargs={
+            "source_h5ad_file_name": helpers.MockTestDataPaths.root
+            / "h5ad"
+            / "mock_test_data.h5ad",
+        },
+        dataset_kwargs={"label_dict_path": helpers.MockTestDataPaths.label_dict_path},
         tokenizer=tokenizer,
         transform_datasets=True,
         collation_strategy="multitask",
@@ -1272,7 +1281,7 @@ def pl_data_module_adamson_weissman_seq_labeling(perturbation_fields_cve):
 
 @pytest.fixture(scope="session")
 def mock_data_seq_cls_ckpt(
-    pl_data_module_mock_data_seq_cls: Zheng68kDataModule,
+    pl_data_module_mock_data_seq_cls,
 ):
     trainer_config = config.TrainerConfig(
         losses=[

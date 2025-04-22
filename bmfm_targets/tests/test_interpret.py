@@ -7,11 +7,11 @@ import pytest
 import torch
 
 from bmfm_targets import config
-from bmfm_targets.datasets import zheng68k
 from bmfm_targets.evaluation import interpret
 from bmfm_targets.tasks import task_utils
 from bmfm_targets.tests import helpers
 from bmfm_targets.tokenization import load_tokenizer
+from bmfm_targets.training.data_module import DataModule
 from bmfm_targets.training.modules import SequenceClassificationTrainingModule
 
 
@@ -39,6 +39,7 @@ def test_interpret_run(pl_data_module_mock_data_seq_cls):
         assert mean_attr_df.shape[0] > 10
 
 
+@helpers.skip_if_missing(["SciPlex3Paths.root"])
 def test_interpret_run_regression(gene2vec_fields):
     from bmfm_targets.datasets.sciplex3 import SciPlex3DataModule
 
@@ -141,14 +142,15 @@ def prepare_interpret_run_on_fresh_model(pl_data_module_mock_data_seq_cls):
         intermediate_size=64,
         hidden_size=32,
     )
-    tokenizer = load_tokenizer("gene2vec")
-    data_module = zheng68k.Zheng68kDataModule(
+    data_module = DataModule(
         dataset_kwargs={
             "processed_data_source": pl_data_module_mock_data_seq_cls.processed_data_file,
-            "source_h5ad_file_name":"mock_test_data.h5ad",
+            "label_dict_path": pl_data_module_mock_data_seq_cls.dataset_kwargs[
+                "label_dict_path"
+            ],
         },
         transform_datasets=False,
-        tokenizer=tokenizer,
+        tokenizer=pl_data_module_mock_data_seq_cls.tokenizer,
         fields=pl_data_module_mock_data_seq_cls.fields,
         label_columns=pl_data_module_mock_data_seq_cls.label_columns,
         collation_strategy="sequence_classification",
@@ -288,6 +290,7 @@ def test_repeated_interpret_run_are_identical(
         pandas.testing.assert_frame_equal(mean_attr_df, mean_attr_df2)
 
 
+@helpers.skip_if_missing(["SciPlex3Paths.root"])
 def test_interpret_run_using_different_data_from_ckpt(
     pl_data_module_mock_data_seq_cls, mock_data_seq_cls_ckpt
 ):
@@ -328,6 +331,7 @@ def test_interpret_run_using_different_data_from_ckpt(
         assert all(i in gene_vocab for i in mean_attr_df.index)
 
 
+@helpers.skip_if_missing(["SciPlex3Paths.root"])
 def test_interpret_run_from_multitask_ckpt(sciplex3_mt_model_and_ckpt):
     from bmfm_targets.datasets import sciplex3
 
