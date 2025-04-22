@@ -1,5 +1,5 @@
 defaults:
-  - data_module: base_seq_cls
+  - data_module: zheng68k
   - tokenizer: all_genes
   - fields: genes_expressions_unmasked
   - trainer: default
