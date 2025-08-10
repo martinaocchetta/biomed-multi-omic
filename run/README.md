@@ -87,6 +87,8 @@ The only thing you need is an h5ad file with raw gene counts to run inference, a
 export MY_DATA_FILE=# h5ad file with raw counts and genes identified by gene symbol
 ```
 
+If you have not defined a split column `"split_random"` as above, please define a split column and set it in the yaml.
+
 ### MLM+RDA
 
 ```bash
