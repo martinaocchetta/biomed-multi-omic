@@ -77,6 +77,21 @@ bmfm-targets-run  -cn finetune label_column_name=celltype split_column_name=null
 bmfm-targets-run -cn finetune label_column_name=celltype split_column_name=null input_file=$MY_DATA_FILE working_dir=/tmp checkpoint=ibm-research/biomed.rna.bert.110m.wced.v1
 ```
 
+## scRNA Pre-training
+
+As above, the user must prepare an h5ad file of raw counts
+
+The only thing you need is an h5ad file with raw gene counts to run inference, and a writable directory `working_dir` for output. For convenience, this page assumes that the location of the file is stored to an environment variable. Checkpoints will be downloaded automatically from HuggingFace.
+
+```bash
+export MY_DATA_FILE=# h5ad file with raw counts and genes identified by gene symbol
+```
+
+### MLM+RDA
+
+```bash
+bmfm-targets-run -cn rda_mlm input_file=$MY_DATA_FILE checkpoint=ibm-research/biomed.rna.bert.110m.mlm.rda.v1
+```
 
 ## DNA Fine-tuning
 
