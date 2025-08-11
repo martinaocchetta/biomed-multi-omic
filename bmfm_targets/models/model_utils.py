@@ -51,6 +51,11 @@ def register_configs_and_models():
     ]
 
     for config_class, lm_class, seqcls_class in _config_maps:
+        print("LM config_class:", lm_class.__name__, getattr(lm_class, "config_class", None))
+        if getattr(lm_class, "config_class", None) is None:
+            lm_class.config_class = config_class
+        if getattr(seqcls_class, "config_class", None) is None:
+            seqcls_class.config_class = config_class
         AutoConfig.register(config_class.model_type, config_class)
         AutoModelForMaskedLM.register(config_class, lm_class)
         AutoModelForSequenceClassification.register(config_class, seqcls_class)
