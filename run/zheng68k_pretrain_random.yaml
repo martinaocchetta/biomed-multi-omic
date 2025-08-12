@@ -22,6 +22,8 @@ fields:
 data_module:
   _target_: bmfm_targets.training.data_module.DataModule
   _partial_: true
+  data_dir: /dccstor/bmfm_gene_diff/users/martinaina/data/zheng68k
+  processed_data_source: raw_counts
   num_workers: 12
   mlm: true
   collation_strategy: language_modeling

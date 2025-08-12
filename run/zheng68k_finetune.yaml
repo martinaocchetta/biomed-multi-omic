@@ -25,9 +25,11 @@ label_columns:
 data_module:
   _target_: bmfm_targets.training.data_module.DataModule
   _partial_: true
+  data_dir: /dccstor/bmfm_gene_diff/users/martinaina/data/zheng68k
+  processed_data_source: raw_counts
   num_workers: 12
   mlm: true
-  collation_strategy: language_modeling
+  collation_strategy: multitask
   shuffle: true
   max_length: 1024
   sequence_order: sorted
@@ -40,6 +42,8 @@ data_module:
   masking_strategy:
     _target_: bmfm_targets.training.masking.strategy.WCEDMasker
     _partial_: true
+  dataset_kwargs:
+    label_dict_path: /dccstor/bmfm_gene_diff/users/martinaina/data/zheng68k/label_dict.json
 model:
   _target_: bmfm_targets.config.SCBertConfig
   _partial_: true
@@ -81,7 +85,7 @@ trainer:
   - field_name: expressions
     name: is_zero_bce
     wced_target: non_input_genes
-  - label_column_name: cell_type
+  - label_column_name: celltype
     weight: 0.9
     name: focal
     focal_gamma: 2
