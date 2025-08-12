@@ -81,7 +81,7 @@ trainer:
   batch_prediction_behavior: track
 task:
   _target_: bmfm_targets.config.TrainingTaskConfig
-  default_root_dir: /dccstor/bmfm_gene_diff/users/martinaina/results/experiments/zheng68k/pretrain/mlm/random
+  default_root_dir: /dccstor/bmfm_gene_diff/users/martinaina/results/experiments/zheng68k/pretrain/mlm/sorted
   max_epochs: 5
   precision: 16-mixed
   val_check_interval: 100
