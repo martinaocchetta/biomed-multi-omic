@@ -196,7 +196,7 @@ def download_ckpt_from_huggingface(hf_repo) -> str:
         logger.warning(
             f"Multiple .ckpt files found in the directory: {local_hf_repo_path}. Using {ckpt_files[0]}."
         )
-    checkpoint = ckpt_files[0]
+    checkpoint = str(ckpt_files[0])
 
     logger.info(f"Downloaded HF checkpoint to: {checkpoint}")
 
