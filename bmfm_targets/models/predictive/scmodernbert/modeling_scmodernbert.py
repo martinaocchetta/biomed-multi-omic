@@ -506,7 +506,7 @@ class SCModernBertEncoderLayer(nn.Module):
 
 
 class SCModernBertPreTrainedModel(PreTrainedModel):
-    config: SCModernBertConfig
+    config_class = SCModernBertConfig
     base_model_prefix = "scmodernbert"
     supports_gradient_checkpointing = True
     _no_split_modules = ["SCModernBertEncoderLayer"]
