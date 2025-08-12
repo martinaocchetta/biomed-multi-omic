@@ -31,7 +31,7 @@ data_module:
   max_length: 1024
   sequence_order: sorted
   switch_ratio: 0.0
-  batch_size: 40
+  batch_size: 16
   limit_genes: protein_coding
   log_normalize_transform: true
   transform_datasets: false
