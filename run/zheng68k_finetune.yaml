@@ -6,9 +6,13 @@ tokenizer:
 fields:
 - _target_: bmfm_targets.config.FieldInfo
   field_name: genes
+  pretrained_embedding: null
+  is_masked: false
 - _target_: bmfm_targets.config.FieldInfo
   field_name: expressions
-  is_masked: false
+  pretrained_embedding: null
+  is_masked: true
+  vocab_update_strategy: dynamic
   tokenization_strategy: continuous_value_encoder
   encoder_kwargs:
     kind: mlp_with_special_token_embedding
@@ -22,19 +26,20 @@ fields:
 label_columns:
 - _target_: bmfm_targets.config.LabelColumnInfo
   label_column_name: celltype
+  is_regression_label: false
 data_module:
   _target_: bmfm_targets.training.data_module.DataModule
   _partial_: true
-  data_dir: /dccstor/bmfm_gene_diff/users/martinaina/data/zheng68k
+  data_dir: "/dccstor/bmfm_gene_diff/users/martinaina/data/zheng68k"
   processed_data_source: raw_counts
   num_workers: 12
   mlm: true
   collation_strategy: multitask
   shuffle: true
   max_length: 1024
-  sequence_order: sorted
+  sequence_order: random
   switch_ratio: 0.0
-  batch_size: 40
+  batch_size: 16
   limit_genes: protein_coding
   log_normalize_transform: true
   transform_datasets: false
@@ -43,7 +48,7 @@ data_module:
     _target_: bmfm_targets.training.masking.strategy.WCEDMasker
     _partial_: true
   dataset_kwargs:
-    label_dict_path: /dccstor/bmfm_gene_diff/users/martinaina/data/zheng68k/label_dict.json
+    label_dict_path: "/dccstor/bmfm_gene_diff/users/martinaina/data/zheng68k/label_dict.json"
 model:
   _target_: bmfm_targets.config.SCBertConfig
   _partial_: true
@@ -57,9 +62,9 @@ model:
   initializer_range: 0.02
   layer_norm_eps: 1.0e-12
   pad_token_id: 0
-  use_cache: true
+  use_cache: false
   attention: torch
-  checkpoint: ibm-research/biomed.rna.bert.110m.wced.multitask.v1
+  checkpoint: "ibm-research/biomed.rna.bert.110m.wced.multitask.v1"
 trainer:
   _target_: bmfm_targets.config.TrainerConfig
   warmup_steps: 1000
@@ -92,8 +97,8 @@ trainer:
   batch_prediction_behavior: track
 task:
   _target_: bmfm_targets.config.TrainingTaskConfig
-  default_root_dir: /dccstor/bmfm_gene_diff/users/martinaina/results/experiments/zheng68k/finetune/celltype
-  max_epochs: 5
+  default_root_dir: "/dccstor/bmfm_gene_diff/users/martinaina/results/experiments/zheng68k/finetune/celltype"
+  max_epochs: 1
   precision: 16-mixed
   val_check_interval: 100
   gradient_clip_val: 0.5
